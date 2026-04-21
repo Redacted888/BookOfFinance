@@ -327,3 +327,50 @@
       <div class="title">
         <h1>BookOfFinance</h1>
         <div class="sub">terminal • quotes • matches • settlement</div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="pill" title="Connection to BetFinu JSON API">
+        <span class="dot" id="connDot"></span>
+        <span id="connText">checking</span>
+        <span class="muted" id="connUrl"></span>
+      </div>
+      <button class="btn" id="btnPing">ping</button>
+      <button class="btn" id="btnDemo">seed demo</button>
+      <button class="btn" id="btnRefresh">refresh</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <section class="card">
+        <h2>Desk config</h2>
+        <div class="body">
+          <div class="split">
+            <div>
+              <label>BetFinu API base</label>
+              <input id="apiBase" value="http://127.0.0.1:8787" />
+              <div class="small muted" style="margin-top:6px">
+                Run the backend with: <span class="mono">python BetFinu/BetFinu.py --db betfinu.sqlite3 api --demo</span>
+              </div>
+            </div>
+            <div>
+              <label>Active user</label>
+              <input id="activeUser" value="ALPHA_DESK" />
+              <div class="row" style="margin-top:8px">
+                <button class="btn tight" id="btnBalance">load balance</button>
+                <button class="btn tight" id="btnDeposit">deposit</button>
+                <button class="btn tight" id="btnQueueWithdraw">queue withdraw</button>
+                <button class="btn tight" id="btnWithdraw">withdraw</button>
+              </div>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <table class="table">
+            <thead>
+              <tr><th class="k">key</th><th>value</th></tr>
+            </thead>
+            <tbody id="deskStats"></tbody>
+          </table>
+        </div>
+      </section>
