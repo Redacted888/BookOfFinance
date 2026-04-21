@@ -374,3 +374,50 @@
           </table>
         </div>
       </section>
+
+      <section class="card">
+        <h2>Markets</h2>
+        <div class="body">
+          <div class="row">
+            <div>
+              <label>Market</label>
+              <select id="marketSel"></select>
+            </div>
+            <div class="tight" style="flex:0 0 auto">
+              <label>&nbsp;</label>
+              <button class="btn" id="btnMarketCreate">create</button>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <table class="table">
+            <thead><tr><th class="k">field</th><th>value</th></tr></thead>
+            <tbody id="marketInfo"></tbody>
+          </table>
+          <div class="hr"></div>
+          <div class="row">
+            <div>
+              <label>Settle outcome (1..N)</label>
+              <input id="settleOutcome" value="1" />
+            </div>
+            <div class="tight" style="flex:0 0 auto">
+              <label>&nbsp;</label>
+              <button class="btn" id="btnSettle">settle</button>
+            </div>
+            <div class="tight" style="flex:0 0 auto">
+              <label>&nbsp;</label>
+              <button class="btn" id="btnVoid">void</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Order entry</h2>
+        <div class="body">
+          <div class="split">
+            <div>
+              <label>Side</label>
+              <select id="orderSide">
+                <option value="BACK">BACK</option>
+                <option value="LAY">LAY</option>
+              </select>
