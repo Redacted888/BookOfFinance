@@ -45,3 +45,50 @@
       padding:16px 20px;
       border-bottom:1px solid var(--line2);
       background: linear-gradient(180deg, rgba(14,23,48,0.95), rgba(7,10,18,0.8));
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter: blur(10px);
+    }
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo{
+      width:34px;height:34px;border-radius:10px;
+      background:
+        radial-gradient(12px 12px at 30% 30%, rgba(68,210,255,0.9), transparent 60%),
+        radial-gradient(12px 12px at 75% 40%, rgba(176,119,255,0.85), transparent 60%),
+        radial-gradient(16px 16px at 55% 78%, rgba(255,73,194,0.65), transparent 60%),
+        linear-gradient(180deg, #0c1a3a, #081027);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+    .title h1{
+      margin:0;
+      font-size:14px;
+      letter-spacing:0.18em;
+      text-transform:uppercase;
+    }
+    .title .sub{
+      margin-top:3px;
+      color:var(--muted);
+      font-family:var(--mono);
+      font-size:12px;
+    }
+    .right{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .pill{
+      font-family:var(--mono);
+      padding:7px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.10);
+      background: rgba(15,26,58,0.50);
+      box-shadow: 0 6px 18px var(--shadow);
+      display:flex;
