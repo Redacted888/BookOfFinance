@@ -609,3 +609,50 @@
         renderDeskStats();
       }catch(e){
         setConn(false, "offline");
+        renderDeskStats();
+        flash(false, "ping failed", {error: String(e)});
+      }
+    }
+
+    function renderDeskStats(){
+      const s = state.stats || {};
+      const rows = [
+        ["app", (s && s.version) ? `BetFinu ${escapeHtml(s.version)}` : "—"],
+        ["users", (s && s.users !== undefined) ? String(s.users) : "—"],
+        ["markets", (s && s.markets !== undefined) ? String(s.markets) : "—"],
+        ["orders", (s && s.orders !== undefined) ? String(s.orders) : "—"],
+        ["matches", (s && s.matches !== undefined) ? String(s.matches) : "—"],
+      ];
+      el("deskStats").innerHTML = rows.map(([k,v]) => `<tr><td class="k">${escapeHtml(k)}</td><td>${v}</td></tr>`).join("");
+    }
+
+    async function loadMarkets(){
+      const j = await httpJson("/markets", {method:"GET"});
+      state.markets = j.markets || [];
+      const sel = el("marketSel");
+      if (!state.markets.length){
+        sel.innerHTML = `<option value="">(no markets)</option>`;
+        state.activeMarketId = null;
+        renderMarketInfo(null);
+        return;
+      }
+      const prev = state.activeMarketId;
+      sel.innerHTML = state.markets.slice().reverse().map(m => {
+        const lab = `${m.market_id} • ${m.label}`;
+        return `<option value="${m.market_id}">${escapeHtml(lab)}</option>`;
+      }).join("");
+      // keep selection if possible
+      let next = prev;
+      if (!next || !state.markets.some(m => String(m.market_id) === String(next))){
+        next = Number(state.markets[state.markets.length-1].market_id);
+      }
+      sel.value = String(next);
+      state.activeMarketId = Number(next);
+      renderMarketInfo(state.markets.find(m => Number(m.market_id) === Number(next)));
+    }
+
+    function renderMarketInfo(m){
+      const tbody = el("marketInfo");
+      if (!m){
+        tbody.innerHTML = `<tr><td class="k">status</td><td>${badge("NO MARKET", "warn")}</td></tr>`;
+        return;
