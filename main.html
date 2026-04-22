@@ -938,3 +938,45 @@
     function bind(){
       el("connUrl").textContent = apiBase().replace("http://","").replace("https://","");
       el("btnPing").addEventListener("click", () => ping());
+      el("btnRefresh").addEventListener("click", () => refreshAll());
+      el("btnDemo").addEventListener("click", () => seedDemo().catch(e => flash(false, "demo failed", {error:String(e)})));
+      el("btnBalance").addEventListener("click", () => loadBalance().catch(e => flash(false, "balance failed", {error:String(e)})));
+      el("btnDeposit").addEventListener("click", () => doDeposit().catch(e => flash(false, "deposit failed", {error:String(e)})));
+      el("btnQueueWithdraw").addEventListener("click", () => doQueueWithdraw().catch(e => flash(false, "queue failed", {error:String(e)})));
+      el("btnWithdraw").addEventListener("click", () => doWithdraw().catch(e => flash(false, "withdraw failed", {error:String(e)})));
+      el("btnMarketCreate").addEventListener("click", () => createMarket().catch(e => flash(false, "create failed", {error:String(e)})));
+      el("btnPostOrder").addEventListener("click", () => postOrder().catch(e => flash(false, "post failed", {error:String(e)})));
+      el("btnTake").addEventListener("click", () => takeOrder().catch(e => flash(false, "take failed", {error:String(e)})));
+      el("btnCancel").addEventListener("click", () => cancelOrder().catch(e => flash(false, "cancel failed", {error:String(e)})));
+      el("btnSettle").addEventListener("click", () => settle().catch(e => flash(false, "settle failed", {error:String(e)})));
+      el("btnVoid").addEventListener("click", () => voidMarket().catch(e => flash(false, "void failed", {error:String(e)})));
+      el("btnClaim").addEventListener("click", () => claim().catch(e => flash(false, "claim failed", {error:String(e)})));
+      el("btnLedgerTail").addEventListener("click", () => ledgerTail().catch(e => flash(false, "ledger failed", {error:String(e)})));
+      el("marketSel").addEventListener("change", async () => {
+        state.activeMarketId = selectedMarketId();
+        renderMarketInfo(state.markets.find(m => Number(m.market_id) === Number(state.activeMarketId)));
+        await loadOrdersAndMatches().catch(e => flash(false, "load failed", {error:String(e)}));
+      });
+      el("apiBase").addEventListener("change", () => {
+        el("connUrl").textContent = apiBase().replace("http://","").replace("https://","");
+        refreshAll().catch(() => {});
+      });
+    }
+
+    async function boot(){
+      bind();
+      setConn(false, "checking");
+      renderDeskStats();
+      await refreshAll().catch(() => {});
+      if (state.refreshTimer) clearInterval(state.refreshTimer);
+      state.refreshTimer = setInterval(() => {
+        if (!document.hidden) {
+          refreshAll().catch(() => {});
+        }
+      }, 4000);
+    }
+
+    boot();
+  </script>
+</body>
+</html>
