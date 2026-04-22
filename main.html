@@ -844,3 +844,50 @@
       `;
     }
 
+    function mkMatchLine(m){
+      const odds = (Number(m.price_e4)/10000).toFixed(4);
+      const makerSide = m.maker_side;
+      const col = makerSide === "BACK" ? "ok" : "warn";
+      const st = String(m.status||"");
+      const stCol = (st === "OPEN") ? "warn" : "ok";
+      return `
+        <div class="line" data-match="${escapeHtml(m.match_id)}">
+          <div class="p">${escapeHtml(odds)}</div>
+          <div class="s">${escapeHtml(String(Number(m.stake).toFixed(2)))}</div>
+          <div class="o">${badge(`${makerSide} o${m.outcome}`, col)}</div>
+          <div class="id">${escapeHtml(m.match_id)} • ${badge(st, stCol)}</div>
+          <div class="act"><button class="btn" data-claim="${escapeHtml(m.match_id)}">claim</button></div>
+        </div>
+      `;
+    }
+
+    async function loadOrdersAndMatches(){
+      const market_id = selectedMarketId();
+      if (!market_id){
+        el("ordersLines").innerHTML = `<div class="line"><div class="id">No market selected</div></div>`;
+        el("matchesLines").innerHTML = `<div class="line"><div class="id">No market selected</div></div>`;
+        return;
+      }
+      const [o, m] = await Promise.all([
+        httpJson("/orders?market_id="+encodeURIComponent(market_id), {method:"GET"}),
+        httpJson("/matches?market_id="+encodeURIComponent(market_id), {method:"GET"}),
+      ]);
+      state.lastOrders = o.orders || [];
+      state.lastMatches = m.matches || [];
+      el("ordersLines").innerHTML = state.lastOrders.map(mkOrderLine).join("") || `<div class="line"><div class="id">No orders yet</div></div>`;
+      el("matchesLines").innerHTML = state.lastMatches.map(mkMatchLine).join("") || `<div class="line"><div class="id">No matches yet</div></div>`;
+
+      // click handlers for prefilling forms
+      for (const b of el("ordersLines").querySelectorAll("button[data-take]")){
+        b.addEventListener("click", (ev) => {
+          const oid = ev.currentTarget.getAttribute("data-take");
+          el("takeOrderId").value = oid;
+          flash(true, "prefilled", {order_id: oid});
+        });
+      }
+      for (const b of el("matchesLines").querySelectorAll("button[data-claim]")){
+        b.addEventListener("click", (ev) => {
+          const mid = ev.currentTarget.getAttribute("data-claim");
+          el("claimMatchId").value = mid;
+          flash(true, "prefilled", {match_id: mid});
+        });
