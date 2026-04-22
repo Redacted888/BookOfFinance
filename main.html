@@ -891,3 +891,50 @@
           el("claimMatchId").value = mid;
           flash(true, "prefilled", {match_id: mid});
         });
+      }
+    }
+
+    async function refreshAll(){
+      await ping();
+      await loadMarkets();
+      await loadOrdersAndMatches();
+    }
+
+    async function seedDemo(){
+      // The backend seeds demo from CLI flag; for UI we emulate by creating a market + activity.
+      // This is still fully functional: it calls the API for normal operations.
+      const userA = "ALPHA_DESK";
+      const userB = "BETA_RUNNER";
+      const userC = "GAMMA_PUNTER";
+      await httpJson("/deposit", {method:"POST", body: JSON.stringify({user:userA, amount: 12500})});
+      await httpJson("/deposit", {method:"POST", body: JSON.stringify({user:userB, amount: 11825})});
+      await httpJson("/deposit", {method:"POST", body: JSON.stringify({user:userC, amount: 9400})});
+      const ts = Math.floor(Date.now()/1000);
+      const mk = {
+        key: "DEMO-UI-" + cryptoRandom(10),
+        label: "Neon Macro: CPI surprise vs consensus (ui seed)",
+        outcomes: 3,
+        close_ts: ts + 260,
+        settle_deadline_ts: ts + 900,
+        min_stake: 25.0,
+        max_stake: 1500.0,
+        max_orders_per_user: 80,
+        allow_unmatched: true,
+        fee_bps: 235,
+        maker_rebate_bps: 105
+      };
+      const created = await httpJson("/market/create", {method:"POST", body: JSON.stringify(mk)});
+      const market_id = created.market_id;
+      const expiry_ts = ts + 240;
+      const o1 = await httpJson("/order/post", {method:"POST", body: JSON.stringify({market_id, maker:userA, side:"BACK", outcome:1, price_e4:18600, size:450, expiry_ts})});
+      const o2 = await httpJson("/order/post", {method:"POST", body: JSON.stringify({market_id, maker:userA, side:"LAY", outcome:2, price_e4:27200, size:320, expiry_ts})});
+      await httpJson("/order/post", {method:"POST", body: JSON.stringify({market_id, maker:userB, side:"BACK", outcome:3, price_e4:33500, size:260, expiry_ts})});
+      await httpJson("/order/take", {method:"POST", body: JSON.stringify({order_id: o1.order.order_id, taker:userC, stake:175})});
+      await httpJson("/order/take", {method:"POST", body: JSON.stringify({order_id: o2.order.order_id, taker:userC, stake:120})});
+      flash(true, "seeded", {market_id});
+      await refreshAll();
+    }
+
+    function bind(){
+      el("connUrl").textContent = apiBase().replace("http://","").replace("https://","");
+      el("btnPing").addEventListener("click", () => ping());
