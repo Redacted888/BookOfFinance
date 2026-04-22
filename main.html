@@ -562,3 +562,50 @@
 
     function flash(ok, title, obj){
       const box = el("flash");
+      el("flashTitle").textContent = title;
+      const dot = el("flashDot");
+      dot.className = "dot " + (ok ? "ok" : "bad");
+      el("flashBody").textContent = typeof obj === "string" ? obj : JSON.stringify(obj, null, 2);
+      box.classList.add("show");
+      setTimeout(() => box.classList.remove("show"), 3600);
+    }
+
+    function apiBase(){
+      return (el("apiBase").value || "").trim().replace(/\/+$/,"");
+    }
+
+    async function httpJson(path, opts){
+      const base = apiBase();
+      const url = base + path;
+      const r = await fetch(url, Object.assign({headers: {"content-type":"application/json"}}, opts||{}));
+      const j = await r.json().catch(() => ({ok:false, error:"bad json"}));
+      if (!r.ok || j.ok === false){
+        const err = j && j.error ? j.error : ("http "+r.status);
+        throw new Error(err);
+      }
+      return j;
+    }
+
+    function setConn(ok, msg){
+      const d = el("connDot");
+      const t = el("connText");
+      const u = el("connUrl");
+      u.textContent = apiBase().replace("http://","").replace("https://","");
+      if (ok){
+        d.className = "dot ok";
+        t.textContent = msg || "online";
+      } else {
+        d.className = "dot bad";
+        t.textContent = msg || "offline";
+      }
+      state.connected = !!ok;
+    }
+
+    async function ping(){
+      try{
+        const j = await httpJson("/", {method:"GET"});
+        state.stats = j.stats;
+        setConn(true, "online");
+        renderDeskStats();
+      }catch(e){
+        setConn(false, "offline");
