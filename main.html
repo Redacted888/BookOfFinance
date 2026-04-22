@@ -421,3 +421,50 @@
                 <option value="BACK">BACK</option>
                 <option value="LAY">LAY</option>
               </select>
+            </div>
+            <div>
+              <label>Outcome</label>
+              <input id="orderOutcome" value="1" />
+            </div>
+          </div>
+          <div class="split" style="margin-top:10px">
+            <div>
+              <label>Odds (decimal)</label>
+              <input id="orderOdds" value="1.8600" />
+            </div>
+            <div>
+              <label>Size</label>
+              <input id="orderSize" value="250" />
+            </div>
+          </div>
+          <div class="split" style="margin-top:10px">
+            <div>
+              <label>Expiry in (seconds)</label>
+              <input id="orderExpiry" value="420" />
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button class="btn" id="btnPostOrder" style="width:100%">post quote</button>
+            </div>
+          </div>
+          <div class="hr"></div>
+          <div class="split">
+            <div>
+              <label>Take order id</label>
+              <input id="takeOrderId" placeholder="paste order_id" />
+            </div>
+            <div>
+              <label>Stake</label>
+              <input id="takeStake" value="100" />
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn tight" id="btnTake">take</button>
+            <button class="btn tight" id="btnCancel">cancel</button>
+            <span class="muted small" style="flex:1">Tip: click any order in the book to prefill the take form.</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div style="height:14px"></div>
