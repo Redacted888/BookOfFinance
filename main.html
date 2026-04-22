@@ -797,3 +797,50 @@
       const market_id = selectedMarketId();
       if (!market_id) throw new Error("select market");
       const outcome = Number(el("settleOutcome").value);
+      const j = await httpJson("/market/settle", {method:"POST", body: JSON.stringify({market_id, outcome})});
+      flash(true, "settled", j.market);
+      await refreshAll();
+    }
+
+    async function voidMarket(){
+      const market_id = selectedMarketId();
+      if (!market_id) throw new Error("select market");
+      const j = await httpJson("/market/void", {method:"POST", body: JSON.stringify({market_id})});
+      flash(true, "voided", j.market);
+      await refreshAll();
+    }
+
+    async function claim(){
+      const match_id = (el("claimMatchId").value||"").trim();
+      if (!match_id) throw new Error("match_id required");
+      const claimant = activeUser();
+      const j = await httpJson("/claim", {method:"POST", body: JSON.stringify({match_id, claimant})});
+      flash(true, "claim processed", j.claim);
+      await refreshAll();
+    }
+
+    async function ledgerTail(){
+      const user = activeUser();
+      const j = await httpJson("/ledger/tail?user="+encodeURIComponent(user)+"&limit=60", {method:"GET"});
+      el("ledgerOut").value = JSON.stringify(j.rows, null, 2);
+      flash(true, "ledger tail", {rows: j.rows.length});
+    }
+
+    function mkOrderLine(o){
+      const side = o.side;
+      const col = side === "BACK" ? "ok" : "warn";
+      const odds = (Number(o.price_e4)/10000).toFixed(4);
+      const rem = Number(o.remaining);
+      const size = Number(o.size);
+      const badgeText = `${side} o${o.outcome}`;
+      return `
+        <div class="line" data-order="${escapeHtml(o.order_id)}">
+          <div class="p">${escapeHtml(odds)}</div>
+          <div class="s">${escapeHtml(String(rem.toFixed(2)))}</div>
+          <div class="o">${badge(badgeText, col)}</div>
+          <div class="id">${escapeHtml(o.order_id)}</div>
+          <div class="act"><button class="btn" data-take="${escapeHtml(o.order_id)}">take</button></div>
+        </div>
+      `;
+    }
+
