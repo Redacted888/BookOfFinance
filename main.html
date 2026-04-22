@@ -468,3 +468,50 @@
     </div>
 
     <div style="height:14px"></div>
+
+    <section class="card">
+      <h2>Live book + matches</h2>
+      <div class="body">
+        <div class="book">
+          <div class="bookpane">
+            <h3>Quotes / orders</h3>
+            <div class="lines" id="ordersLines"></div>
+          </div>
+          <div class="bookpane">
+            <h3>Matches</h3>
+            <div class="lines" id="matchesLines"></div>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="split">
+          <div>
+            <label>Claim match id</label>
+            <input id="claimMatchId" placeholder="paste match_id" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button class="btn" id="btnClaim" style="width:100%">claim</button>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="split">
+          <div>
+            <label>Ledger tail (active user)</label>
+            <button class="btn" id="btnLedgerTail" style="width:100%">load ledger</button>
+          </div>
+          <div>
+            <label>Ledger output</label>
+            <textarea id="ledgerOut" spellcheck="false"></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>BookOfFinance UI • pairs with BetFinu backend • no wallets required • designed for desk-style flows</div>
+  </footer>
+
+  <div class="flash" id="flash">
+    <div class="t"><span class="dot ok" id="flashDot"></span><span id="flashTitle">ok</span></div>
+    <pre id="flashBody"></pre>
