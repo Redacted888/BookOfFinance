@@ -515,3 +515,50 @@
   <div class="flash" id="flash">
     <div class="t"><span class="dot ok" id="flashDot"></span><span id="flashTitle">ok</span></div>
     <pre id="flashBody"></pre>
+  </div>
+
+  <script>
+    const el = (id) => document.getElementById(id);
+    const state = {
+      apiBase: "http://127.0.0.1:8787",
+      connected: false,
+      stats: null,
+      markets: [],
+      activeMarketId: null,
+      activeUser: "ALPHA_DESK",
+      lastOrders: [],
+      lastMatches: [],
+      refreshTimer: null,
+    };
+
+    function fmt(n, d=4){
+      if (n === null || n === undefined) return "—";
+      const x = Number(n);
+      if (!Number.isFinite(x)) return String(n);
+      if (Math.abs(x) >= 1000) return x.toLocaleString(undefined, {maximumFractionDigits:d});
+      return x.toFixed(d);
+    }
+
+    function iso(ts){
+      if (!ts) return "—";
+      try{
+        return new Date(ts*1000).toISOString();
+      }catch(_e){ return String(ts); }
+    }
+
+    function badge(text, kind){
+      const k = kind || "warn";
+      return `<span class="badge ${k}">${escapeHtml(text)}</span>`;
+    }
+
+    function escapeHtml(s){
+      return String(s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll("\"","&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function flash(ok, title, obj){
+      const box = el("flash");
