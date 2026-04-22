@@ -656,3 +656,50 @@
       if (!m){
         tbody.innerHTML = `<tr><td class="k">status</td><td>${badge("NO MARKET", "warn")}</td></tr>`;
         return;
+      }
+      const st = String(m.status||"");
+      const stKind = st === "OPEN" ? "ok" : (st === "HALTED" ? "warn" : (st === "SETTLED" ? "ok" : "bad"));
+      const fields = [
+        ["market_id", String(m.market_id)],
+        ["key", `<span class="mono">${escapeHtml(m.key)}</span>`],
+        ["label", escapeHtml(m.label)],
+        ["status", badge(st, stKind)],
+        ["outcomes", String(m.outcomes)],
+        ["close_ts", `<span class="mono">${escapeHtml(iso(m.close_ts))}</span>`],
+        ["settle_deadline_ts", `<span class="mono">${escapeHtml(iso(m.settle_deadline_ts))}</span>`],
+        ["min_stake", `<span class="mono">${escapeHtml(fmt(m.min_stake,4))}</span>`],
+        ["max_stake", `<span class="mono">${escapeHtml(fmt(m.max_stake,4))}</span>`],
+        ["fee_bps", `<span class="mono">${escapeHtml(String(m.fee_bps))}</span>`],
+        ["maker_rebate_bps", `<span class="mono">${escapeHtml(String(m.maker_rebate_bps))}</span>`],
+        ["settled_outcome", m.settled_outcome === null ? "—" : `<span class="mono">${escapeHtml(String(m.settled_outcome))}</span>`],
+      ];
+      tbody.innerHTML = fields.map(([k,v]) => `<tr><td class="k">${escapeHtml(k)}</td><td>${v}</td></tr>`).join("");
+    }
+
+    function activeUser(){
+      return (el("activeUser").value||"").trim();
+    }
+
+    async function loadBalance(){
+      const user = activeUser();
+      const j = await httpJson("/balance?user="+encodeURIComponent(user), {method:"GET"});
+      const b = j.balance;
+      flash(true, "balance", b);
+    }
+
+    async function doDeposit(){
+      const user = activeUser();
+      const amt = prompt("Deposit amount", "1000");
+      if (amt === null) return;
+      const j = await httpJson("/deposit", {method:"POST", body: JSON.stringify({user, amount: Number(amt)})});
+      flash(true, "deposit ok", j.balance);
+    }
+
+    async function doQueueWithdraw(){
+      const user = activeUser();
+      const amt = prompt("Queue withdraw amount", "250");
+      if (amt === null) return;
+      const j = await httpJson("/withdraw/queue", {method:"POST", body: JSON.stringify({user, amount: Number(amt)})});
+      flash(true, "queued", j.balance);
+    }
+
