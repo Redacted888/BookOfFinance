@@ -703,3 +703,50 @@
       flash(true, "queued", j.balance);
     }
 
+    async function doWithdraw(){
+      const user = activeUser();
+      const j = await httpJson("/withdraw", {method:"POST", body: JSON.stringify({user})});
+      flash(true, "withdraw ok", j.balance);
+    }
+
+    function selectedMarketId(){
+      const v = el("marketSel").value;
+      return v ? Number(v) : null;
+    }
+
+    async function createMarket(){
+      const key = "UI-" + cryptoRandom(10);
+      const label = prompt("Market label", "Terminal Macro: rate decision (ui)");
+      if (label === null) return;
+      const outcomes = Number(prompt("Outcomes (2..8)", "3") || "3");
+      const closeIn = Number(prompt("Close in seconds", "600") || "600");
+      const settleAfter = Number(prompt("Settle deadline after close (seconds)", "1800") || "1800");
+      const ts = Math.floor(Date.now()/1000);
+      const body = {
+        key,
+        label,
+        outcomes,
+        close_ts: ts + closeIn,
+        settle_deadline_ts: ts + closeIn + settleAfter,
+        min_stake: 25.0,
+        max_stake: 1500.0,
+        max_orders_per_user: 90,
+        allow_unmatched: true,
+        fee_bps: 240,
+        maker_rebate_bps: 110
+      };
+      const j = await httpJson("/market/create", {method:"POST", body: JSON.stringify(body)});
+      flash(true, "market created", j.market);
+      await refreshAll();
+    }
+
+    function cryptoRandom(n){
+      const buf = new Uint8Array(n);
+      crypto.getRandomValues(buf);
+      const alpha = "23456789abcdefghjkmnpqrstuvwxyz";
+      let out = "";
+      for (let i=0;i<buf.length;i++){
+        out += alpha[buf[i] % alpha.length];
+      }
+      return out;
+    }
