@@ -750,3 +750,50 @@
       }
       return out;
     }
+
+    function oddsToE4(oddsText){
+      const x = Number(oddsText);
+      if (!Number.isFinite(x) || x <= 0) throw new Error("bad odds");
+      return Math.round(x*10000);
+    }
+
+    async function postOrder(){
+      const market_id = selectedMarketId();
+      if (!market_id) throw new Error("select market");
+      const maker = activeUser();
+      const side = el("orderSide").value;
+      const outcome = Number(el("orderOutcome").value);
+      const price_e4 = oddsToE4(el("orderOdds").value);
+      const size = Number(el("orderSize").value);
+      const expiry_in = Number(el("orderExpiry").value);
+      const ts = Math.floor(Date.now()/1000);
+      const body = {market_id, maker, side, outcome, price_e4, size, expiry_ts: ts + expiry_in};
+      const j = await httpJson("/order/post", {method:"POST", body: JSON.stringify(body)});
+      flash(true, "quote posted", j.order);
+      await refreshAll();
+    }
+
+    async function takeOrder(){
+      const order_id = (el("takeOrderId").value||"").trim();
+      if (!order_id) throw new Error("order_id required");
+      const taker = activeUser();
+      const stake = Number(el("takeStake").value);
+      const j = await httpJson("/order/take", {method:"POST", body: JSON.stringify({order_id, taker, stake})});
+      flash(true, "matched", j.match);
+      el("claimMatchId").value = j.match.match_id;
+      await refreshAll();
+    }
+
+    async function cancelOrder(){
+      const order_id = (el("takeOrderId").value||"").trim();
+      if (!order_id) throw new Error("order_id required");
+      const by = activeUser();
+      const j = await httpJson("/order/cancel", {method:"POST", body: JSON.stringify({order_id, by})});
+      flash(true, "canceled", j.order);
+      await refreshAll();
+    }
+
+    async function settle(){
+      const market_id = selectedMarketId();
+      if (!market_id) throw new Error("select market");
+      const outcome = Number(el("settleOutcome").value);
